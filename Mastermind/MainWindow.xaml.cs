@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
@@ -22,6 +24,7 @@ namespace Mastermind
             "Blue" // 5
         };
 
+        private List<string> _playerNames = new List<string>();
         private string[] _code = new string[4];
         private string[] _playerGuess = new string[4];
         private Label[] _labels = new Label[4];
@@ -55,11 +58,39 @@ namespace Mastermind
         public MainWindow()
         {
             InitializeComponent();
-            GenerateColorCode();
+
             _labels[0] = colorLabel1;
             _labels[1] = colorLabel2;
             _labels[2] = colorLabel3;
             _labels[3] = colorLabel4;
+
+            StartGame();
+        }
+
+        private void StartGame()
+        {
+            bool addNewPlayer = true;
+
+            while (addNewPlayer)
+            {
+                string playerName = Interaction.InputBox("Player name:", "Add player");
+
+                while (string.IsNullOrWhiteSpace(playerName))
+                {
+                    MessageBox.Show("Please input a valid name", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    playerName = Interaction.InputBox("Player name:", "Add player");
+                }
+
+                _playerNames.Add(playerName);
+
+                MessageBoxResult addPlayerResult = MessageBox.Show("Would you like to add another player?", "Add player", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (addPlayerResult == MessageBoxResult.No)
+                {
+                    addNewPlayer = false;
+                }
+            }
+
+            NewGame();
         }
 
         private void GenerateColorCode()
@@ -156,11 +187,11 @@ namespace Mastermind
                 {
                     Width = 40,
                     Height = 40,
-                    Background = _labels[i].Background, // Use the Background of the Label
-                    BorderBrush = _labels[i].BorderBrush.Clone(), // Clone the Label's BorderBrush
-                    BorderThickness = _labels[i].BorderThickness, // Use the Label's BorderThickness
-                    CornerRadius = new CornerRadius(20), // Half of Width/Height for a perfect circle
-                    Margin = new Thickness(5) // Add some spacing
+                    Background = _labels[i].Background,
+                    BorderBrush = _labels[i].BorderBrush.Clone(),
+                    BorderThickness = _labels[i].BorderThickness,
+                    CornerRadius = new CornerRadius(20),
+                    Margin = new Thickness(5)
                 };
             }
 
@@ -209,6 +240,8 @@ namespace Mastermind
 
         private void NewGame()
         {
+            // TODO: save player score & attempts
+
             for (int i = 0; i < _labels.Length; i++)
             {
                 _labels[i].Background = Brushes.Transparent;
