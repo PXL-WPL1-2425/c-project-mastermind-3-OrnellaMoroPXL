@@ -14,6 +14,9 @@ namespace Mastermind
     /// </summary>
     public partial class MainWindow : Window
     {
+        private int _attempts = 0;
+        private string[] _code = new string[4];
+
         private string[] _colors = new string[6]
         {
             "Red", // 0
@@ -24,19 +27,31 @@ namespace Mastermind
             "Blue" // 5
         };
 
-        private List<string> _playerNames = new List<string>();
-        private string[] _code = new string[4];
-        private string[] _playerGuess = new string[4];
-        private Label[] _labels = new Label[4];
-        private int _attempts = 0;
-        private int _score = 100;
-        private Border[,] _guessHistory = new Border[10, 4];
+        private string _currentPlayer;
 
         //close message enkel mid-game met dit
         private bool _gameIsOngoing = true;
 
+        private Border[,] _guessHistory = new Border[10, 4];
+        private Label[] _labels = new Label[4];
+        private string[] _playerGuess = new string[4];
+        private List<string> _playerNames = new List<string>();
+        private int _score = 100;
+
         // zogenaamde debug
         private bool _showSolution = false;
+
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            _labels[0] = colorLabel1;
+            _labels[1] = colorLabel2;
+            _labels[2] = colorLabel3;
+            _labels[3] = colorLabel4;
+
+            StartGame();
+        }
 
         // override > space > onClosING!! kiezen uit de dropdown
         protected override void OnClosing(CancelEventArgs e)
@@ -52,66 +67,6 @@ namespace Mastermind
                 {
                     e.Cancel = true;
                 }
-            }
-        }
-
-        public MainWindow()
-        {
-            InitializeComponent();
-
-            _labels[0] = colorLabel1;
-            _labels[1] = colorLabel2;
-            _labels[2] = colorLabel3;
-            _labels[3] = colorLabel4;
-
-            StartGame();
-        }
-
-        private void StartGame()
-        {
-            bool addNewPlayer = true;
-
-            while (addNewPlayer)
-            {
-                string playerName = Interaction.InputBox("Player name:", "Add player");
-
-                while (string.IsNullOrWhiteSpace(playerName))
-                {
-                    MessageBox.Show("Please input a valid name", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    playerName = Interaction.InputBox("Player name:", "Add player");
-                }
-
-                _playerNames.Add(playerName);
-
-                MessageBoxResult addPlayerResult = MessageBox.Show("Would you like to add another player?", "Add player", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                if (addPlayerResult == MessageBoxResult.No)
-                {
-                    addNewPlayer = false;
-                }
-            }
-
-            NewGame();
-        }
-
-        private void GenerateColorCode()
-        {
-            Random random = new Random();
-
-            for (int i = 0; i < 4; i++)
-            {
-                int randomColorIndex = random.Next(6);
-                _code[i] = _colors[randomColorIndex];
-            }
-
-            UpdateTitle();
-        }
-
-        private void UpdateTitle()
-        {
-            Title = $"Mastermind";
-            if (_showSolution)
-            {
-                Title += $" ({string.Join(", ", _code)})";
             }
         }
 
@@ -152,6 +107,117 @@ namespace Mastermind
                     colorLabel4.BorderThickness = new Thickness(3);
                     colorLabel4.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(selectedColor));
                 }
+            }
+        }
+
+        private void GenerateColorCode()
+        {
+            Random random = new Random();
+
+            for (int i = 0; i < 4; i++)
+            {
+                int randomColorIndex = random.Next(6);
+                _code[i] = _colors[randomColorIndex];
+            }
+
+            UpdateTitle();
+        }
+
+        private void NewGame()
+        {
+            // TODO: save player score & attempts
+
+            for (int i = 0; i < _labels.Length; i++)
+            {
+                _labels[i].Background = Brushes.Transparent;
+                _labels[i].BorderBrush = Brushes.LightGray;
+                _labels[i].BorderThickness = new Thickness(1);
+            }
+
+            _attempts = 0;
+            _score = 100;
+            _guessHistory = new Border[10, 4];
+            userGuessHistory.Children.Clear();
+
+            UpdateAttempt();
+            UpdateScore();
+            UpdateHistory();
+
+            GenerateColorCode();
+        }
+
+        private void StartGame()
+        {
+            bool addNewPlayer = true;
+
+            while (addNewPlayer)
+            {
+                string playerName = Interaction.InputBox("Player name:", "Add player");
+
+                while (string.IsNullOrWhiteSpace(playerName))
+                {
+                    MessageBox.Show("Please input a valid name", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    playerName = Interaction.InputBox("Player name:", "Add player");
+                }
+
+                _playerNames.Add(playerName);
+
+                MessageBoxResult addPlayerResult = MessageBox.Show("Would you like to add another player?", "Add player", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (addPlayerResult == MessageBoxResult.No)
+                {
+                    addNewPlayer = false;
+                }
+            }
+
+            NewGame();
+        }
+
+        private void UpdateAttempt()
+        {
+            attemptLabel.Content = $"{_attempts}/10";
+        }
+
+        private void UpdateHistory()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    Border border = (Border)_guessHistory.GetValue(i, j);
+
+                    if (border == null)
+                    {
+                        continue;
+                    }
+
+                    border.Height = 40;
+                    border.Width = 40;
+                    border.HorizontalAlignment = HorizontalAlignment.Center;
+                    border.VerticalAlignment = VerticalAlignment.Center;
+                    border.Margin = new Thickness(6);
+
+                    Grid.SetRow(border, i);
+                    Grid.SetColumn(border, j);
+
+                    if (!userGuessHistory.Children.Contains(border))
+                    {
+                        userGuessHistory.Children.Add(border);
+                    }
+                }
+            }
+        }
+
+        private void UpdateScore()
+        {
+            scoreLabel.Content = _score;
+        }
+
+        private void UpdateTitle()
+        {
+            Title = $"Mastermind";
+            if (_showSolution)
+            {
+                Title += $" ({string.Join(", ", _code)})";
             }
         }
 
@@ -234,69 +300,6 @@ namespace Mastermind
                 else
                 {
                     NewGame();
-                }
-            }
-        }
-
-        private void NewGame()
-        {
-            // TODO: save player score & attempts
-
-            for (int i = 0; i < _labels.Length; i++)
-            {
-                _labels[i].Background = Brushes.Transparent;
-                _labels[i].BorderBrush = Brushes.LightGray;
-                _labels[i].BorderThickness = new Thickness(1);
-            }
-
-            _attempts = 0;
-            _score = 100;
-            _guessHistory = new Border[10, 4];
-            userGuessHistory.Children.Clear();
-
-            UpdateAttempt();
-            UpdateScore();
-            UpdateHistory();
-
-            GenerateColorCode();
-        }
-
-        private void UpdateScore()
-        {
-            scoreLabel.Content = _score;
-        }
-
-        private void UpdateAttempt()
-        {
-            attemptLabel.Content = $"{_attempts}/10";
-        }
-
-        private void UpdateHistory()
-        {
-            for (int i = 0; i < 10; i++)
-            {
-                for (int j = 0; j < 4; j++)
-                {
-                    Border border = (Border)_guessHistory.GetValue(i, j);
-
-                    if (border == null)
-                    {
-                        continue;
-                    }
-
-                    border.Height = 40;
-                    border.Width = 40;
-                    border.HorizontalAlignment = HorizontalAlignment.Center;
-                    border.VerticalAlignment = VerticalAlignment.Center;
-                    border.Margin = new Thickness(6);
-
-                    Grid.SetRow(border, i);
-                    Grid.SetColumn(border, j);
-
-                    if (!userGuessHistory.Children.Contains(border))
-                    {
-                        userGuessHistory.Children.Add(border);
-                    }
                 }
             }
         }
