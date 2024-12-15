@@ -287,12 +287,14 @@ namespace Mastermind
                 {
                     _labels[i].BorderBrush = Brushes.Black;
                     _labels[i].BorderThickness = new Thickness(3);
+                    _labels[i].ToolTip = "Right colour and position!";
                 }
                 else if (_code.Contains(_playerGuess[i]))
                 {
                     _labels[i].BorderBrush = Brushes.Wheat;
                     _labels[i].BorderThickness = new Thickness(3);
                     //kleur op de foute plaats = -1 punt
+                    _labels[i].ToolTip = "Right colour, wrong position!";
                     _score = _score - 1;
                     answerIsGuessed = false;
                 }
@@ -300,6 +302,7 @@ namespace Mastermind
                 {
                     _score = _score - 2;
                     answerIsGuessed = false;
+                    _labels[i].ToolTip = "Wrong colour!";
                 }
             }
 
