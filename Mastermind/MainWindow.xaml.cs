@@ -34,6 +34,7 @@ namespace Mastermind
 
         private Border[,] _guessHistory = new Border[10, 4];
         private Label[] _labels = new Label[4];
+        private ComboBox[] _comboBoxes = new ComboBox[4];
         private string[] _playerGuess = new string[4];
         private List<string> _playerNames = new List<string>();
         private int _score = 100;
@@ -49,6 +50,11 @@ namespace Mastermind
             _labels[1] = colorLabel2;
             _labels[2] = colorLabel3;
             _labels[3] = colorLabel4;
+
+            _comboBoxes[0] = comboBox1;
+            _comboBoxes[1] = comboBox2;
+            _comboBoxes[2] = comboBox3;
+            _comboBoxes[3] = comboBox4;
 
             StartGame();
         }
@@ -68,6 +74,12 @@ namespace Mastermind
                     e.Cancel = true;
                 }
             }
+        }
+
+        private void ChooseCurrentPlayer()
+        {
+            _currentPlayer = NextPlayer();
+            currentPlayerLabel.Content = _currentPlayer;
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -125,7 +137,7 @@ namespace Mastermind
 
         private void NewGame()
         {
-            _currentPlayer = NextPlayer();
+            ChooseCurrentPlayer();
 
             if (string.IsNullOrEmpty(_currentPlayer))
             {
@@ -150,11 +162,13 @@ namespace Mastermind
                 return;
             }
 
-            for (int i = 0; i < _labels.Length; i++)
+            for (int i = 0; i < 4; i++)
             {
                 _labels[i].Background = Brushes.Transparent;
                 _labels[i].BorderBrush = Brushes.LightGray;
                 _labels[i].BorderThickness = new Thickness(1);
+
+                _comboBoxes[i].SelectedItem = null;
             }
 
             _attempts = 0;
@@ -169,14 +183,6 @@ namespace Mastermind
             GenerateColorCode();
         }
 
-        private void RestartGame()
-        {
-            // Clear players
-            _playerNames.Clear();
-
-            StartGame();
-        }
-
         private string NextPlayer()
         {
             if (_currentPlayer == null)
@@ -186,6 +192,14 @@ namespace Mastermind
 
             int nextPlayerIndex = _playerNames.IndexOf(_currentPlayer) + 1;
             return _playerNames.ElementAtOrDefault(nextPlayerIndex); // out of bounds -> default
+        }
+
+        private void RestartGame()
+        {
+            // Clear players
+            _playerNames.Clear();
+
+            StartGame();
         }
 
         private void StartGame()

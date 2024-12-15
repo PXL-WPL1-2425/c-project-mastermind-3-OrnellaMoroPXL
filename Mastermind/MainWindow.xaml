@@ -51,12 +51,13 @@
 
         <Label Name="colorLabel4" Width="120" Height="120" HorizontalAlignment="Left" Margin="385,37,0,0" VerticalAlignment="Top" BorderBrush="LightGray" BorderThickness="1" />
 
-        <Button Content="Check answers" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="332" Click="ValidateAnswers_Click" Name="validateAnswersButton" Margin="10,166,0,0" />
-        <Label Content="Attempts:" HorizontalAlignment="Left" Margin="385,161,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Right" Width="60" />
-        <Label Name="attemptLabel" Content="0/10" HorizontalAlignment="Left" Margin="450,161,0,0" VerticalAlignment="Top" Width="55" HorizontalContentAlignment="Center" />
-        <Label Content="Score:" HorizontalAlignment="Left" Margin="385,189,0,0" VerticalAlignment="Top" Width="60" HorizontalContentAlignment="Right" />
-        <Label Name="scoreLabel" Content="100" HorizontalAlignment="Left" Margin="450,189,0,0" VerticalAlignment="Top" Width="60" HorizontalContentAlignment="Center" />
-        <Grid Name="userGuessHistory" Margin="10,220,10,10">
+        <Button Content="Check answers" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="495" Click="ValidateAnswers_Click" Name="validateAnswersButton" Margin="10,166,0,0" />
+        <Label Content="Attempts:" HorizontalAlignment="Left" Margin="385,199,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Right" Width="60" />
+        <Label Name="attemptLabel" Content="0/10" HorizontalAlignment="Left" Margin="450,199,0,0" VerticalAlignment="Top" Width="55" HorizontalContentAlignment="Center" />
+        <Label Content="Score:" HorizontalAlignment="Left" Margin="255,199,0,0" VerticalAlignment="Top" Width="60" HorizontalContentAlignment="Right" />
+        <Label Name="scoreLabel" Content="100" HorizontalAlignment="Left" Margin="320,199,0,0" VerticalAlignment="Top" Width="60" HorizontalContentAlignment="Center" />
+
+        <Grid Name="userGuessHistory" Margin="10,249,10,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
@@ -76,5 +77,8 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
         </Grid>
+
+        <Label Margin="10,199,0,0" Content="Player:" Width="57" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Right" />
+        <Label Name="currentPlayerLabel" Margin="72,199,0,0" Width="200" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" />
     </Grid>
 </Window>
