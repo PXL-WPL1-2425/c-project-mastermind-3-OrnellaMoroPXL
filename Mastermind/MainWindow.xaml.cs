@@ -27,20 +27,21 @@ namespace Mastermind
             "Blue" // 5
         };
 
+        private ComboBox[] _comboBoxes = new ComboBox[4];
         private string _currentPlayer;
 
         //close message enkel mid-game met dit
         private bool _gameIsOngoing = true;
 
         private Border[,] _guessHistory = new Border[10, 4];
+        private HintWindow _hintWindow;
         private Label[] _labels = new Label[4];
-        private ComboBox[] _comboBoxes = new ComboBox[4];
         private string[] _playerGuess = new string[4];
         private List<string> _playerNames = new List<string>();
         private int _score = 100;
 
         // zogenaamde debug
-        private bool _showSolution = false;
+        private bool _showSolution = true;
 
         public MainWindow()
         {
@@ -135,6 +136,79 @@ namespace Mastermind
             UpdateTitle();
         }
 
+        private void HintButton_Click(object sender, RoutedEventArgs e)
+        {
+            _hintWindow = new HintWindow()
+            {
+                Owner = this
+            };
+
+            _hintWindow.Show();
+
+            _hintWindow.correctColourButton.Click += HintCorrectColourButton_Click;
+            _hintWindow.correctColourAndPositionButton.Click += HintCorrectColourAndPositionButton_Click;
+        }
+
+        private void HintCorrectColourAndPositionButton_Click(object sender, RoutedEventArgs e)
+        {
+            int hintIndex = -1;
+            for (int i = 0; i < 4; i++)
+            {
+                if (hintIndex >= 0)
+                {
+                    continue;
+                }
+
+                if (_playerGuess[i] != _code[i])
+                {
+                    hintIndex = i;
+                }
+            }
+
+            if (hintIndex >= 0)
+            {
+                _playerGuess[hintIndex] = _code[hintIndex];
+                _comboBoxes[hintIndex].SelectedItem = _code[hintIndex]; // doet niks for some reason
+
+                _labels[hintIndex].BorderBrush = Brushes.Black;
+                _labels[hintIndex].BorderThickness = new Thickness(3);
+                _labels[hintIndex].Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(_code[hintIndex])); // label verandert eindelijk, maar combobox niet
+                _labels[hintIndex].ToolTip = "Nice move! Or should we call it an investment?";
+
+                _score -= 25;
+                UpdateScore();
+            }
+
+            _hintWindow.Close();
+        }
+
+        private void HintCorrectColourButton_Click(object sender, RoutedEventArgs e)
+        {
+            string hint = null;
+            for (int i = 0; i < 4; i++)
+            {
+                if (hint != null)
+                {
+                    continue;
+                }
+
+                if (!_playerGuess.Contains(_code[i]))
+                {
+                    hint = _code[i];
+                }
+            }
+
+            if (hint != null)
+            {
+                MessageBox.Show(hint, "Hint");
+
+                _score -= 15;
+                UpdateScore();
+            }
+
+            _hintWindow.Close();
+        }
+
         private void NewGame()
         {
             ChooseCurrentPlayer();
@@ -143,7 +217,7 @@ namespace Mastermind
             {
                 // TODO: Include winner?
                 MessageBoxResult answer = MessageBox.Show(
-                    "This is the end of the game. Thank you for playing! Do you want to play again?",
+                    "The game has nothing left to give you... except for another round. Replay?",
                     "Game over!",
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Question);
@@ -212,7 +286,7 @@ namespace Mastermind
 
                 while (string.IsNullOrWhiteSpace(playerName))
                 {
-                    MessageBox.Show("Please input a valid name", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Nice try, but we’re looking for a name, not a riddle.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     playerName = Interaction.InputBox("Player name:", "Add player");
                 }
 
@@ -287,14 +361,14 @@ namespace Mastermind
                 {
                     _labels[i].BorderBrush = Brushes.Black;
                     _labels[i].BorderThickness = new Thickness(3);
-                    _labels[i].ToolTip = "Right colour and position!";
+                    _labels[i].ToolTip = "This is what perfection looks like!";
                 }
                 else if (_code.Contains(_playerGuess[i]))
                 {
                     _labels[i].BorderBrush = Brushes.Wheat;
                     _labels[i].BorderThickness = new Thickness(3);
                     //kleur op de foute plaats = -1 punt
-                    _labels[i].ToolTip = "Right colour, wrong position!";
+                    _labels[i].ToolTip = "This colour is correct... somewhere else.";
                     _score = _score - 1;
                     answerIsGuessed = false;
                 }
@@ -302,7 +376,7 @@ namespace Mastermind
                 {
                     _score = _score - 2;
                     answerIsGuessed = false;
-                    _labels[i].ToolTip = "Wrong colour!";
+                    _labels[i].ToolTip = "Wrong colour, but a stylish one!";
                 }
             }
 

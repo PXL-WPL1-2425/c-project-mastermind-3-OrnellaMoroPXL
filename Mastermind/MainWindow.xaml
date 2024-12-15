@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Mastermind"
         mc:Ignorable="d"
-        Title="Mastermind" Height="880" Width="535">
+        Title="Mastermind" Height="880" Width="535" WindowStartupLocation="CenterScreen">
     <Grid>
         <ComboBox HorizontalAlignment="Left" Height="25" Margin="10,10,0,0" VerticalAlignment="Top" Width="120" Name="comboBox1" SelectionChanged="ComboBox_SelectionChanged">
             <ComboBoxItem Content="Red" />
@@ -51,7 +51,8 @@
 
         <Label Name="colorLabel4" Width="120" Height="120" HorizontalAlignment="Left" Margin="385,37,0,0" VerticalAlignment="Top" BorderBrush="LightGray" BorderThickness="1" />
 
-        <Button Content="Check answers" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="495" Click="ValidateAnswers_Click" Name="validateAnswersButton" Margin="10,166,0,0" />
+        <Button Content="Check answers" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="370" Click="ValidateAnswers_Click" Name="validateAnswersButton" Margin="10,166,0,0" />
+        <Button Content="Hint" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Name="hintButton" Margin="385,166,0,0" Width="120" Click="HintButton_Click" />
         <Label Content="Attempts:" HorizontalAlignment="Left" Margin="385,199,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Right" Width="60" />
         <Label Name="attemptLabel" Content="0/10" HorizontalAlignment="Left" Margin="450,199,0,0" VerticalAlignment="Top" Width="55" HorizontalContentAlignment="Center" />
         <Label Content="Score:" HorizontalAlignment="Left" Margin="255,199,0,0" VerticalAlignment="Top" Width="60" HorizontalContentAlignment="Right" />
