@@ -125,7 +125,30 @@ namespace Mastermind
 
         private void NewGame()
         {
-            // TODO: save player score & attempts
+            _currentPlayer = NextPlayer();
+
+            if (string.IsNullOrEmpty(_currentPlayer))
+            {
+                // TODO: Include winner?
+                MessageBoxResult answer = MessageBox.Show(
+                    "This is the end of the game. Thank you for playing! Do you want to play again?",
+                    "Game over!",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (answer == MessageBoxResult.Yes)
+                {
+                    RestartGame();
+                }
+                else
+                {
+                    _gameIsOngoing = false;
+
+                    Close();
+                }
+
+                return;
+            }
 
             for (int i = 0; i < _labels.Length; i++)
             {
@@ -144,6 +167,25 @@ namespace Mastermind
             UpdateHistory();
 
             GenerateColorCode();
+        }
+
+        private void RestartGame()
+        {
+            // Clear players
+            _playerNames.Clear();
+
+            StartGame();
+        }
+
+        private string NextPlayer()
+        {
+            if (_currentPlayer == null)
+            {
+                return _playerNames.First();
+            }
+
+            int nextPlayerIndex = _playerNames.IndexOf(_currentPlayer) + 1;
+            return _playerNames.ElementAtOrDefault(nextPlayerIndex); // out of bounds -> default
         }
 
         private void StartGame()
@@ -266,41 +308,29 @@ namespace Mastermind
             UpdateScore();
             UpdateHistory();
 
-            // als antwoord juist is -> "wil je verderspelen?"
-            if (answerIsGuessed)
+            if (answerIsGuessed || _attempts == 10)
             {
-                MessageBoxResult winMessage = MessageBox.Show(
-                   $"You did it in {_attempts} tries! The code never stood a chance!\r\nUp for another round?", "WINNER", //<-message titel moet blijkbaar, anders error
-                   MessageBoxButton.YesNo,
-                   MessageBoxImage.Information);
-                _gameIsOngoing = false;
+                string message = $"You did it in {_attempts} tries! The code never stood a chance!";
 
-                if (winMessage == MessageBoxResult.No)
+                if (_attempts == 10)
                 {
-                    Close();
+                    message = $"Close, but no cigar! The answer was: {string.Join(", ", _code)}.";
                 }
-                else
-                {
-                    NewGame();
-                }
-            }
-            else if (_attempts == 10)
-            {
-                MessageBoxResult loseMessage = MessageBox.Show(
-                    $"Close, but no cigar! The answer was: {string.Join(", ", _code)}.\r\nTry again?", "FAILED",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
 
-                _gameIsOngoing = false;
+                string nextPlayer = NextPlayer();
 
-                if (loseMessage == MessageBoxResult.No)
+                if (nextPlayer != null)
                 {
-                    Close();
+                    message += $"\r\nNext player is: {nextPlayer}";
                 }
-                else
-                {
-                    NewGame();
-                }
+
+                MessageBox.Show(
+                    message,
+                    _currentPlayer, // message titel moet blijkbaar, anders error
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                NewGame();
             }
         }
     }
